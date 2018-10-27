@@ -14,6 +14,10 @@ type Box interface {
 	Addable
 	Finder
 	Walkable
+	Haser
+}
+
+type Haser interface {
 	Has(string) bool
 }
 
