@@ -23,6 +23,7 @@ type Haser interface {
 
 type Walkable interface {
 	Walk(wf WalkFunc) error
+	WalkPrefix(prefix string, wf WalkFunc) error
 }
 
 type Finder interface {

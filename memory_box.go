@@ -127,6 +127,15 @@ func (m *MemoryBox) Walk(wf WalkFunc) error {
 	return err
 }
 
+func (m *MemoryBox) WalkPrefix(pre string, wf WalkFunc) error {
+	return m.Walk(func(path string, file File) error {
+		if strings.HasPrefix(path, pre) {
+			return wf(path, file)
+		}
+		return nil
+	})
+}
+
 func (m *MemoryBox) Remove(path string) {
 	m.files.Delete(path)
 }
