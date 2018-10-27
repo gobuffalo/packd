@@ -39,10 +39,7 @@ func (f virtualFile) Stat() (os.FileInfo, error) {
 // NewDir returns a new "virtual" file
 func NewFile(name string, r io.Reader) (File, error) {
 	bb := &bytes.Buffer{}
-	_, err := io.Copy(bb, r)
-	if err != nil {
-		return nil, err
-	}
+	io.Copy(bb, r)
 	return virtualFile{
 		Buffer: bb,
 		Name:   name,

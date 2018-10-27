@@ -34,10 +34,7 @@ func Test_MemoryBox(t *testing.T) {
 	wm := map[string]string{}
 	box.Walk(func(path string, file File) error {
 		bb := &bytes.Buffer{}
-		_, err := io.Copy(bb, file)
-		if err != nil {
-			return err
-		}
+		io.Copy(bb, file)
 		wm[path] = bb.String()
 		return nil
 	})
