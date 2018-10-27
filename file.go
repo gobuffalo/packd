@@ -7,7 +7,6 @@ import (
 	"time"
 )
 
-var virtualFileModTime = time.Now()
 var _ File = virtualFile{}
 
 type virtualFile struct {
