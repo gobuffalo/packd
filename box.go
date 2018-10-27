@@ -47,3 +47,10 @@ type File interface {
 	Seek(offset int64, whence int) (int64, error)
 	Stat() (os.FileInfo, error)
 }
+
+type LegacyBox interface {
+	String(name string) string
+	MustString(name string) (string, error)
+	Bytes(name string) []byte
+	MustBytes(name string) ([]byte, error)
+}
