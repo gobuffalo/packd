@@ -48,15 +48,24 @@ type Addable interface {
 	AddBytes(path string, t []byte) error
 }
 
-type File interface {
-	Name() string
+type SimpleFile interface {
 	fmt.Stringer
-	io.ReadCloser
+	io.Reader
 	io.Writer
-	FileInfo() (os.FileInfo, error)
+	Name() string
+}
+
+type HTTPFile interface {
+	SimpleFile
+	io.Closer
+	io.Seeker
 	Readdir(count int) ([]os.FileInfo, error)
-	Seek(offset int64, whence int) (int64, error)
 	Stat() (os.FileInfo, error)
+}
+
+type File interface {
+	HTTPFile
+	FileInfo() (os.FileInfo, error)
 }
 
 // LegacyBox represents deprecated methods

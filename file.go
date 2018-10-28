@@ -47,6 +47,11 @@ func (s *virtualFile) String() string {
 	return s.Buffer.String()
 }
 
+func (s *virtualFile) Write(p []byte) (int, error) {
+	s.Buffer.Reset()
+	return s.Buffer.Write(p)
+}
+
 // NewDir returns a new "virtual" file
 func NewFile(name string, r io.Reader) (File, error) {
 	bb := &bytes.Buffer{}
