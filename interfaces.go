@@ -1,6 +1,7 @@
 package packd
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
@@ -49,6 +50,7 @@ type Addable interface {
 
 type File interface {
 	Name() string
+	fmt.Stringer
 	io.ReadCloser
 	io.Writer
 	FileInfo() (os.FileInfo, error)
