@@ -2,21 +2,29 @@ package packd
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"time"
 )
 
-var _ File = virtualFile{}
+var _ File = &virtualFile{}
+var _ io.Reader = &virtualFile{}
+var _ io.Writer = &virtualFile{}
+var _ fmt.Stringer = &virtualFile{}
 
 type virtualFile struct {
 	*bytes.Buffer
-	Name string
+	name string
 	info fileInfo
 }
 
+func (f virtualFile) Name() string {
+	return f.name
+}
+
 func (f virtualFile) Seek(offset int64, whence int) (int64, error) {
-	return 0, nil
+	return -1, nil
 }
 
 func (f virtualFile) FileInfo() (os.FileInfo, error) {
@@ -35,13 +43,17 @@ func (f virtualFile) Stat() (os.FileInfo, error) {
 	return f.info, nil
 }
 
+func (s *virtualFile) String() string {
+	return s.Buffer.String()
+}
+
 // NewDir returns a new "virtual" file
 func NewFile(name string, r io.Reader) (File, error) {
 	bb := &bytes.Buffer{}
 	io.Copy(bb, r)
-	return virtualFile{
+	return &virtualFile{
 		Buffer: bb,
-		Name:   name,
+		name:   name,
 		info: fileInfo{
 			Path:     name,
 			Contents: bb.Bytes(),
@@ -54,9 +66,9 @@ func NewFile(name string, r io.Reader) (File, error) {
 // NewDir returns a new "virtual" directory
 func NewDir(name string) (File, error) {
 	bb := &bytes.Buffer{}
-	return virtualFile{
+	return &virtualFile{
 		Buffer: bb,
-		Name:   name,
+		name:   name,
 		info: fileInfo{
 			Path:     name,
 			Contents: bb.Bytes(),
