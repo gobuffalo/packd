@@ -6,6 +6,8 @@ import (
 	"io"
 	"os"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 var _ File = &virtualFile{}
@@ -14,7 +16,7 @@ var _ io.Writer = &virtualFile{}
 var _ fmt.Stringer = &virtualFile{}
 
 type virtualFile struct {
-	*bytes.Buffer
+	buf  *bytes.Buffer
 	name string
 	info fileInfo
 }
@@ -44,12 +46,27 @@ func (f virtualFile) Stat() (os.FileInfo, error) {
 }
 
 func (s *virtualFile) String() string {
-	return s.Buffer.String()
+	return s.buf.String()
+}
+
+func (s *virtualFile) Read(p []byte) (int, error) {
+	return s.buf.Read(p)
 }
 
 func (s *virtualFile) Write(p []byte) (int, error) {
-	s.Buffer.Reset()
-	return s.Buffer.Write(p)
+	bb := &bytes.Buffer{}
+	i, err := bb.Write(p)
+	if err != nil {
+		return i, errors.WithStack(err)
+	}
+	s.buf = bb
+	s.info = fileInfo{
+		Path:     s.name,
+		Contents: bb.Bytes(),
+		size:     int64(bb.Len()),
+		modTime:  time.Now(),
+	}
+	return i, nil
 }
 
 // NewDir returns a new "virtual" file
@@ -59,8 +76,8 @@ func NewFile(name string, r io.Reader) (File, error) {
 		io.Copy(bb, r)
 	}
 	return &virtualFile{
-		Buffer: bb,
-		name:   name,
+		buf:  bb,
+		name: name,
 		info: fileInfo{
 			Path:     name,
 			Contents: bb.Bytes(),
@@ -74,8 +91,8 @@ func NewFile(name string, r io.Reader) (File, error) {
 func NewDir(name string) (File, error) {
 	bb := &bytes.Buffer{}
 	return &virtualFile{
-		Buffer: bb,
-		name:   name,
+		buf:  bb,
+		name: name,
 		info: fileInfo{
 			Path:     name,
 			Contents: bb.Bytes(),
