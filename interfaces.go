@@ -48,6 +48,7 @@ type Addable interface {
 }
 
 type File interface {
+	Name() string
 	io.ReadCloser
 	io.Writer
 	FileInfo() (os.FileInfo, error)
