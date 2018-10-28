@@ -50,7 +50,9 @@ func (s *virtualFile) String() string {
 // NewDir returns a new "virtual" file
 func NewFile(name string, r io.Reader) (File, error) {
 	bb := &bytes.Buffer{}
-	io.Copy(bb, r)
+	if r != nil {
+		io.Copy(bb, r)
+	}
 	return &virtualFile{
 		Buffer: bb,
 		name:   name,
