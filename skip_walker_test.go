@@ -19,6 +19,7 @@ func Test_SkipWalker(t *testing.T) {
 		"_example/foo.go",
 		"_example/bar.go",
 		"actions/app_test.go",
+		"/go/src/hello_world/node_modules/ejs/README.md",
 	}
 
 	for _, f := range files {

@@ -21,19 +21,21 @@ func SkipWalker(walker Walker, skipPrefixes []string, wf WalkFunc) error {
 		if err != nil {
 			return errors.WithStack(err)
 		}
-		var base string
 
-		if fi.IsDir() {
-			base = strings.ToLower(filepath.Base(path))
-		} else {
-			base = strings.ToLower(filepath.Dir(path))
+		parts := strings.Split(path, string(filepath.Separator))
+
+		if !fi.IsDir() {
+			parts = parts[:len(parts)-1]
 		}
 
-		if base != "." {
-			for _, skip := range skipPrefixes {
-				skip = strings.ToLower(skip)
-				if strings.HasPrefix(base, skip) {
-					return filepath.SkipDir
+		for _, base := range parts {
+			if base != "." {
+				for _, skip := range skipPrefixes {
+					skip = strings.ToLower(skip)
+					lbase := strings.ToLower(base)
+					if strings.HasPrefix(lbase, skip) {
+						return filepath.SkipDir
+					}
 				}
 			}
 		}
