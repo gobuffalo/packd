@@ -18,8 +18,10 @@ func Test_SkipWalker(t *testing.T) {
 		"actions/app.go",
 		"_example/foo.go",
 		"_example/bar.go",
+		"_EXAMPLE/bar.go",
 		"actions/app_test.go",
 		"/go/src/hello_world/node_modules/ejs/README.md",
+		"/go/src/hello_world/NODE_MODULES/ejs/README.md",
 	}
 
 	for _, f := range files {
