@@ -9,6 +9,8 @@ import (
 	"sort"
 	"strings"
 	"sync"
+
+	"github.com/pkg/errors"
 )
 
 var _ Addable = NewMemoryBox()
@@ -139,12 +141,19 @@ func (m *MemoryBox) Walk(wf WalkFunc) error {
 
 		err = wf(path, f)
 		if err != nil {
+			if errors.Cause(err) == filepath.SkipDir {
+				err = nil
+				return true
+			}
 			return false
 		}
 
 		return true
 	})
 
+	if errors.Cause(err) == filepath.SkipDir {
+		return nil
+	}
 	return err
 }
 
