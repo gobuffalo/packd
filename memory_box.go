@@ -76,13 +76,18 @@ func (m *MemoryBox) FindString(path string) (string, error) {
 }
 
 func (m *MemoryBox) Find(path string) ([]byte, error) {
+	fmt.Println("### path ->", path)
 	res, ok := m.files.Load(path)
+	fmt.Println("### string(res) ->", fmt.Sprint(res))
+	fmt.Println("### ok ->", ok)
 	if !ok {
 
 		var b []byte
 		lpath := strings.ToLower(path)
 		err := m.Walk(func(p string, file File) error {
 			lp := strings.ToLower(p)
+			fmt.Println("### lp ->", lp)
+			fmt.Println("### lpath ->", lpath)
 			if lp != lpath {
 				return nil
 			}
