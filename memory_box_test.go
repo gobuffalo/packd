@@ -2,6 +2,7 @@ package packd
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -122,6 +123,9 @@ func Test_HTTPBox_CaseInsensitive(t *testing.T) {
 			res := httptest.NewRecorder()
 
 			mux.ServeHTTP(res, req)
+			res.Flush()
+			fmt.Println("### res ->", res)
+			fmt.Println("### res.Body.String() ->", res.Body.String())
 
 			r.Equal(200, res.Code)
 			r.Equal("this is my file", strings.TrimSpace(res.Body.String()))

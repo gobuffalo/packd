@@ -1,6 +1,7 @@
 package packd
 
 import (
+	"bytes"
 	"io"
 	"io/ioutil"
 	"strings"
@@ -20,6 +21,22 @@ func Test_NewFile(t *testing.T) {
 	b, err := ioutil.ReadAll(f)
 	r.NoError(err)
 	r.Equal(input, string(b))
+}
+
+func Test_File_Reader(t *testing.T) {
+	r := require.New(t)
+
+	input := "hi"
+	f, err := NewFile("foo.txt", strings.NewReader(input))
+	r.NoError(err)
+	r.Equal(input, f.String())
+
+	bb := &bytes.Buffer{}
+	i, err := io.Copy(bb, f)
+	r.NoError(err)
+	r.Equal(int64(2), i)
+	r.Equal(input, bb.String())
+	r.Equal(input, f.String())
 }
 
 func Test_File_Writer(t *testing.T) {
