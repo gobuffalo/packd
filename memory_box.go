@@ -78,6 +78,7 @@ func (m *MemoryBox) FindString(path string) (string, error) {
 func (m *MemoryBox) Find(path string) ([]byte, error) {
 	fmt.Println("### path ->", path)
 	res, ok := m.files.Load(path)
+	fmt.Printf("### res -> %T\n", res)
 	fmt.Println("### string(res) ->", fmt.Sprint(res))
 	fmt.Println("### ok ->", ok)
 	if !ok {
@@ -103,10 +104,12 @@ func (m *MemoryBox) Find(path string) ([]byte, error) {
 		if len(b) == 0 {
 			return b, os.ErrNotExist
 		}
-
+		fmt.Println("### (!ok) string(b) ->", string(b))
 		return b, nil
 	}
 	b, ok := res.([]byte)
+	fmt.Println("### (final) b ->", b)
+	fmt.Println("### ok ->", ok)
 	if !ok {
 		return nil, fmt.Errorf("expected []byte got %T", res)
 	}
