@@ -57,16 +57,20 @@ func (m *MemoryBox) Open(path string) (http.File, error) {
 	}
 
 	b, err := m.Find(cpath)
+	fmt.Println("### err ->", err)
 	if err != nil {
 		return nil, err
 	}
 
 	cpath = filepath.FromSlash(cpath)
+	fmt.Println("### cpath ->", cpath)
 
 	f, err := NewFile(cpath, bytes.NewReader(b))
+	fmt.Println("### err ->", err)
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("### f ->", f)
 	return f, nil
 }
 
