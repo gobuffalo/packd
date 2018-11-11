@@ -57,20 +57,16 @@ func (m *MemoryBox) Open(path string) (http.File, error) {
 	}
 
 	b, err := m.Find(cpath)
-	fmt.Println("### err ->", err)
 	if err != nil {
 		return nil, err
 	}
 
 	cpath = filepath.FromSlash(cpath)
-	fmt.Println("### cpath ->", cpath)
 
 	f, err := NewFile(cpath, bytes.NewReader(b))
-	fmt.Println("### err ->", err)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("### f ->", f)
 	return f, nil
 }
 
@@ -80,19 +76,13 @@ func (m *MemoryBox) FindString(path string) (string, error) {
 }
 
 func (m *MemoryBox) Find(path string) ([]byte, error) {
-	fmt.Println("### path ->", path)
 	res, ok := m.files.Load(path)
-	fmt.Printf("### res -> %T\n", res)
-	fmt.Println("### string(res) ->", fmt.Sprint(res))
-	fmt.Println("### ok ->", ok)
 	if !ok {
 
 		var b []byte
 		lpath := strings.ToLower(path)
 		err := m.Walk(func(p string, file File) error {
 			lp := strings.ToLower(p)
-			fmt.Println("### lp ->", lp)
-			fmt.Println("### lpath ->", lpath)
 			if lp != lpath {
 				return nil
 			}
@@ -108,12 +98,9 @@ func (m *MemoryBox) Find(path string) ([]byte, error) {
 		if len(b) == 0 {
 			return b, os.ErrNotExist
 		}
-		fmt.Println("### (!ok) string(b) ->", string(b))
 		return b, nil
 	}
 	b, ok := res.([]byte)
-	fmt.Println("### (final) b ->", b)
-	fmt.Println("### ok ->", ok)
 	if !ok {
 		return nil, fmt.Errorf("expected []byte got %T", res)
 	}
