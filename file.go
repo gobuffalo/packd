@@ -50,7 +50,13 @@ func (s *virtualFile) String() string {
 }
 
 func (s *virtualFile) Read(p []byte) (int, error) {
-	return s.buf.Read(p)
+	d := s.buf.Bytes()
+	i, err := s.buf.Read(p)
+	s.buf = bytes.NewBuffer(d)
+	if err != nil && err != io.EOF {
+		return 0, err
+	}
+	return i, io.EOF
 }
 
 func (s *virtualFile) Write(p []byte) (int, error) {

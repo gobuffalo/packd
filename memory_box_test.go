@@ -122,6 +122,7 @@ func Test_HTTPBox_CaseInsensitive(t *testing.T) {
 			res := httptest.NewRecorder()
 
 			mux.ServeHTTP(res, req)
+			res.Flush()
 
 			r.Equal(200, res.Code)
 			r.Equal("this is my file", strings.TrimSpace(res.Body.String()))

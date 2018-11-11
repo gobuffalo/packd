@@ -98,7 +98,6 @@ func (m *MemoryBox) Find(path string) ([]byte, error) {
 		if len(b) == 0 {
 			return b, os.ErrNotExist
 		}
-
 		return b, nil
 	}
 	b, ok := res.([]byte)
