@@ -50,7 +50,7 @@ func (f virtualFile) String() string {
 	return string(f.original)
 }
 
-func (s *virtualFile) Read(p []byte) (int, error) {
+func (s virtualFile) Read(p []byte) (int, error) {
 	i, err := s.buf.Read(p)
 
 	if i == 0 || err == io.EOF {
