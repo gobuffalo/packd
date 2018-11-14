@@ -15,7 +15,7 @@ import (
 
 var bigString = func() string {
 	bb := &bytes.Buffer{}
-	for i := 0; i < 100000; i++ {
+	for i := 0; i < 100; i++ {
 		bb.WriteString("xxxxx")
 	}
 	return bb.String()
