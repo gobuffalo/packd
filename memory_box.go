@@ -75,7 +75,12 @@ func (m *MemoryBox) FindString(path string) (string, error) {
 	return string(bb), err
 }
 
-func (m *MemoryBox) Find(path string) ([]byte, error) {
+func (m *MemoryBox) Find(path string) (ret []byte, e error) {
+	defer func() {
+		fmt.Println("### path ->", path)
+		fmt.Println("### string(ret) ->", string(ret))
+		fmt.Println("### e ->", e)
+	}()
 	res, ok := m.files.Load(path)
 	if !ok {
 
