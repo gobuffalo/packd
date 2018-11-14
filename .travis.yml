@@ -32,5 +32,5 @@ matrix:
 install: false
 
 script: 
-  - go get -v -tags ${TAGS} -t ./.
+  - go get -v -tags ${TAGS} -t ./...
   - go test -v -tags ${TAGS} -timeout=5s -race ./...
