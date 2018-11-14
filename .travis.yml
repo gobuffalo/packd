@@ -29,6 +29,8 @@ matrix:
     env:
       - GO111MODULE=on
 
-install: go get -v -tags ${TAGS} -t ./..
+install: false
 
-script: go test -v -tags ${TAGS} -timeout=5s -race ./...
+script: 
+  - go get -v -tags ${TAGS} -t ./.
+  - go test -v -tags ${TAGS} -timeout=5s -race ./...
