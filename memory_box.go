@@ -64,6 +64,7 @@ func (m *MemoryBox) Open(path string) (http.File, error) {
 	cpath = filepath.FromSlash(cpath)
 
 	f, err := NewFile(cpath, bytes.NewReader(b))
+	fmt.Println("### err ->", err)
 	if err != nil {
 		return nil, err
 	}
