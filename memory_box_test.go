@@ -2,7 +2,6 @@ package packd
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -81,7 +80,6 @@ func Test_HTTPBox(t *testing.T) {
 	mux.ServeHTTP(res, req)
 
 	r.Equal(200, res.Code)
-	fmt.Println("### res.Body.String( ->", res.Body.String())
 	r.Equal(bigString, strings.TrimSpace(res.Body.String()))
 	l := res.Header().Get("Content-Length")
 	r.Equal(strconv.Itoa(len(bigString)), l)

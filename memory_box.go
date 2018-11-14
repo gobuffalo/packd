@@ -64,7 +64,6 @@ func (m *MemoryBox) Open(path string) (http.File, error) {
 	cpath = filepath.FromSlash(cpath)
 
 	f, err := NewFile(cpath, bytes.NewReader(b))
-	fmt.Println("### err ->", err)
 	if err != nil {
 		return nil, err
 	}
@@ -77,11 +76,6 @@ func (m *MemoryBox) FindString(path string) (string, error) {
 }
 
 func (m *MemoryBox) Find(path string) (ret []byte, e error) {
-	defer func() {
-		fmt.Println("### path ->", path)
-		fmt.Println("### string(ret) ->", string(ret))
-		fmt.Println("### e ->", e)
-	}()
 	res, ok := m.files.Load(path)
 	if !ok {
 
