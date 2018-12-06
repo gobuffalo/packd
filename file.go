@@ -72,10 +72,9 @@ func (s *virtualFile) Write(p []byte) (int, error) {
 	s.buf = bb
 	s.original = bb.Bytes()
 	s.info = fileInfo{
-		Path:     s.name,
-		Contents: bb.Bytes(),
-		size:     int64(bb.Len()),
-		modTime:  time.Now(),
+		Path:    s.name,
+		size:    int64(bb.Len()),
+		modTime: time.Now(),
 	}
 	return i, nil
 }
@@ -91,10 +90,9 @@ func NewFile(name string, r io.Reader) (File, error) {
 		name:     name,
 		original: bb.Bytes(),
 		info: fileInfo{
-			Path:     name,
-			Contents: bb.Bytes(),
-			size:     int64(bb.Len()),
-			modTime:  time.Now(),
+			Path:    name,
+			size:    int64(bb.Len()),
+			modTime: time.Now(),
 		},
 	}, nil
 }
@@ -106,11 +104,10 @@ func NewDir(name string) (File, error) {
 		buf:  bb,
 		name: name,
 		info: fileInfo{
-			Path:     name,
-			Contents: bb.Bytes(),
-			size:     int64(bb.Len()),
-			modTime:  time.Now(),
-			isDir:    true,
+			Path:    name,
+			size:    int64(bb.Len()),
+			modTime: time.Now(),
+			isDir:   true,
 		},
 	}, nil
 }
