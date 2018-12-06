@@ -81,6 +81,20 @@ func (s *virtualFile) Write(p []byte) (int, error) {
 
 // NewDir returns a new "virtual" file
 func NewFile(name string, r io.Reader) (File, error) {
+	return buildFile(name, r)
+}
+
+// NewDir returns a new "virtual" directory
+func NewDir(name string) (File, error) {
+	v, err := buildFile(name, nil)
+	if err != nil {
+		return v, errors.WithStack(err)
+	}
+	v.info.isDir = true
+	return v, nil
+}
+
+func buildFile(name string, r io.Reader) (*virtualFile, error) {
 	bb := &bytes.Buffer{}
 	if r != nil {
 		io.Copy(bb, r)
@@ -93,21 +107,6 @@ func NewFile(name string, r io.Reader) (File, error) {
 			Path:    name,
 			size:    int64(bb.Len()),
 			modTime: time.Now(),
-		},
-	}, nil
-}
-
-// NewDir returns a new "virtual" directory
-func NewDir(name string) (File, error) {
-	bb := &bytes.Buffer{}
-	return &virtualFile{
-		buf:  bb,
-		name: name,
-		info: fileInfo{
-			Path:    name,
-			size:    int64(bb.Len()),
-			modTime: time.Now(),
-			isDir:   true,
 		},
 	}, nil
 }
