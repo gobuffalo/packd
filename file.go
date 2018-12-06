@@ -16,7 +16,7 @@ var _ io.Writer = &virtualFile{}
 var _ fmt.Stringer = &virtualFile{}
 
 type virtualFile struct {
-	buf      *bytes.Buffer
+	io.Reader
 	name     string
 	info     fileInfo
 	original []byte
@@ -28,7 +28,7 @@ func (f virtualFile) Name() string {
 
 func (f *virtualFile) Seek(offset int64, whence int) (int64, error) {
 	if offset == 0 && whence == io.SeekStart {
-		f.buf = bytes.NewBuffer(f.original)
+		f.Reader = bytes.NewReader(f.original)
 		return 0, nil
 	}
 	return -1, errors.New("unsuported Seek operation")
@@ -55,10 +55,13 @@ func (f virtualFile) String() string {
 }
 
 func (s *virtualFile) Read(p []byte) (int, error) {
-	i, err := s.buf.Read(p)
+	if s.Reader == nil {
+		s.Reader = bytes.NewReader(s.original)
+	}
+	i, err := s.Reader.Read(p)
 
 	if i == 0 || err == io.EOF {
-		s.buf = bytes.NewBuffer(s.original)
+		s.Reader = bytes.NewReader(s.original)
 	}
 	return i, err
 }
@@ -69,7 +72,6 @@ func (s *virtualFile) Write(p []byte) (int, error) {
 	if err != nil {
 		return i, errors.WithStack(err)
 	}
-	s.buf = bb
 	s.original = bb.Bytes()
 	s.info = fileInfo{
 		Path:    s.name,
@@ -100,7 +102,6 @@ func buildFile(name string, r io.Reader) (*virtualFile, error) {
 		io.Copy(bb, r)
 	}
 	return &virtualFile{
-		buf:      bb,
 		name:     name,
 		original: bb.Bytes(),
 		info: fileInfo{
