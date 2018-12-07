@@ -27,11 +27,7 @@ func (f virtualFile) Name() string {
 }
 
 func (f *virtualFile) Seek(offset int64, whence int) (int64, error) {
-	if offset == 0 && whence == io.SeekStart {
-		f.Reader = bytes.NewReader(f.original)
-		return 0, nil
-	}
-	return -1, errors.New("unsuported Seek operation")
+	return f.Reader.(*bytes.Reader).Seek(offset, whence)
 }
 
 func (f virtualFile) FileInfo() (os.FileInfo, error) {
@@ -54,34 +50,51 @@ func (f virtualFile) String() string {
 	return string(f.original)
 }
 
-func (s *virtualFile) Read(p []byte) (int, error) {
-	if s.Reader == nil {
-		s.Reader = bytes.NewReader(s.original)
-	}
-	i, err := s.Reader.Read(p)
+// Read reads the next len(p) bytes from the virtualFile and
+// rewind read offset to 0 when it met EOF.
+func (f *virtualFile) Read(p []byte) (int, error) {
+	i, err := f.Reader.Read(p)
 
 	if i == 0 || err == io.EOF {
-		s.Reader = bytes.NewReader(s.original)
+		f.Seek(0, io.SeekStart)
 	}
 	return i, err
 }
 
-func (s *virtualFile) Write(p []byte) (int, error) {
-	bb := &bytes.Buffer{}
-	i, err := bb.Write(p)
-	if err != nil {
-		return i, errors.WithStack(err)
-	}
-	s.original = bb.Bytes()
-	s.info = fileInfo{
-		Path:    s.name,
-		size:    int64(bb.Len()),
-		modTime: time.Now(),
-	}
-	return i, nil
+// Write copies byte slice p to content of virtualFile.
+func (f *virtualFile) Write(p []byte) (int, error) {
+	return f.write(p)
 }
 
-// NewDir returns a new "virtual" file
+// write copies byte slice or data from io.Reader to content of the
+// virtualFile and update related information of the virtualFile.
+func (f *virtualFile) write(d interface{}) (c int, err error) {
+	bb := &bytes.Buffer{}
+	switch d.(type) {
+	case []byte:
+		c, err = bb.Write(d.([]byte))
+	case io.Reader:
+		if d != nil {
+			i64, e := io.Copy(bb, d.(io.Reader))
+			c = int(i64)
+			err = e
+		}
+	default:
+		err = errors.New("unknown type of argument")
+	}
+
+	if err != nil {
+		return c, errors.WithStack(err)
+	}
+
+	f.info.size = int64(c)
+	f.info.modTime = time.Now()
+	f.original = bb.Bytes()
+	f.Reader = bytes.NewReader(f.original)
+	return c, nil
+}
+
+// NewFile returns a new "virtual" file
 func NewFile(name string, r io.Reader) (File, error) {
 	return buildFile(name, r)
 }
@@ -97,17 +110,19 @@ func NewDir(name string) (File, error) {
 }
 
 func buildFile(name string, r io.Reader) (*virtualFile, error) {
-	bb := &bytes.Buffer{}
-	if r != nil {
-		io.Copy(bb, r)
-	}
-	return &virtualFile{
-		name:     name,
-		original: bb.Bytes(),
+	vf := &virtualFile{
+		name: name,
 		info: fileInfo{
 			Path:    name,
-			size:    int64(bb.Len()),
 			modTime: time.Now(),
 		},
-	}, nil
+	}
+
+	var err error
+	if r != nil {
+		_, err = vf.write(r)
+	} else {
+		_, err = vf.write([]byte{}) // for safety
+	}
+	return vf, errors.Wrap(err, "could not make virtual file")
 }
