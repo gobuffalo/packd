@@ -38,12 +38,18 @@ func Test_File_Reader(t *testing.T) {
 	r.Equal(input, bb.String())
 	r.Equal(input, f.String())
 
+	// eof
+	buf := make([]byte, 2)
+	n, err := f.Read(buf)
+	r.Equal(0, n)
+	r.Error(err, io.EOF.Error())
+
 	// read again
 	bb2 := &bytes.Buffer{}
 	i, err = io.Copy(bb2, f)
 	r.NoError(err)
-	r.Equal(int64(2), i)
-	r.Equal(input, bb2.String())
+	r.Equal(int64(0), i)
+	r.Empty(bb2.String())
 	r.Equal(input, f.String())
 }
 
