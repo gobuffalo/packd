@@ -51,12 +51,7 @@ func (f virtualFile) String() string {
 // Read reads the next len(p) bytes from the virtualFile and
 // rewind read offset to 0 when it met EOF.
 func (f *virtualFile) Read(p []byte) (int, error) {
-	i, err := f.Reader.Read(p)
-
-	if i == 0 || err == io.EOF {
-		f.Seek(0, io.SeekStart)
-	}
-	return i, err
+	return f.Reader.Read(p)
 }
 
 // Write copies byte slice p to content of virtualFile.
